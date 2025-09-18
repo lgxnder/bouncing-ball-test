@@ -26,6 +26,9 @@ class Ball:
         self.shape.density      = density
         self.shape.elasticity   = elasticity
 
+        image = pygame.image.load("ball_10x10.png")
+        self.texture = pygame.transform.scale(image, (self.shape.radius*2, self.shape.radius*2))
+
     def add_to_space(self):
         space.add(self.body, self.shape)    
 
@@ -148,7 +151,8 @@ while window_running:
     display.fill((235, 235, 235))
 
     pygame.draw.circle(display, (255, 0, 0), (ball1.body.position[0], ball1.body.position[1]), 10)
-    
+    display.blit(ball1.texture, (ball1.body.position[0] - ball1.shape.radius, ball1.body.position[1] - ball1.shape.radius))
+
     for wall in walls:
         wall.draw()
 
