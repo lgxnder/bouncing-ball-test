@@ -1,5 +1,6 @@
 import pygame
 import pymunk
+import random
 
 
 pygame.init()
@@ -13,21 +14,31 @@ window_running = True
 target_fps = 60
 
 # create space
-space = pymunk.Space()  # holds the logic for our physics 'world' or 'space'
+space: pymunk.Space = pymunk.Space()  # holds the logic for our physics 'world' or 'space'
 space.gravity = 0, 1000
 
 
 class Ball:
-    def __init__(self, position: tuple, radius: float, density=1, elasticity=1):
+    def __init__(self, position: tuple, radius: float, density=1, elasticity=1, collision_type=1):
         self.body = pymunk.Body()
         self.body.position = position
+        self.body.velocity = random.uniform(-100, 100), random.uniform(-100, 100)
 
         self.shape = pymunk.Circle(self.body, radius)
         self.shape.density      = density
         self.shape.elasticity   = elasticity
+        self.shape.collision_type = collision_type
 
         image = pygame.image.load("ball_10x10.png")
         self.texture = pygame.transform.scale(image, (self.shape.radius*2, self.shape.radius*2))
+
+    def draw(self):
+        pygame.draw.circle(
+            display,
+            (255, 0, 0),
+            (self.body.position[0], self.body.position[1]),
+            self.shape.radius
+        )
 
     def add_to_space(self):
         space.add(self.body, self.shape)    
@@ -39,6 +50,7 @@ class Wall:
         self.end_pos    = end_pos
         self.radius     = radius
         self.elasticity = elasticity
+
 
         self.segment_body = pymunk.Body(body_type=pymunk.Body.STATIC)
         self.segment_shape = pymunk.Segment(
@@ -62,81 +74,97 @@ class Wall:
         space.add(self.segment_body, self.segment_shape)
 
 
-wall1 = Wall(
-    (50, 500),
-    (150, 520),
-    5,
-    0.75
-)
+def init_walls():
+    wall1 = Wall(
+        (50, 500),
+        (150, 520),
+        5,
+        0.75
+    )
 
-wall2 = Wall(
-    (397, 464),
-    (485, 407),
-    5,
-    1
-)
+    wall2 = Wall(
+        (397, 464),
+        (485, 407),
+        5,
+        1
+    )
 
-wall3 = Wall(
-    (20, 333),
-    (20, 396),
-    5,
-    1
-)
+    wall3 = Wall(
+        (20, 333),
+        (20, 396),
+        5,
+        1
+    )
 
-wall4 = Wall(
-    (257, 587),
-    (348, 577),
-    5,
-    1
-)
+    wall4 = Wall(
+        (257, 587),
+        (348, 577),
+        5,
+        1
+    )
 
-wall5 = Wall(
-    (517, 632),
-    (578, 532),
-    5,
-    1
-)
+    wall5 = Wall(
+        (517, 632),
+        (578, 532),
+        5,
+        1
+    )
 
-wall6 = Wall(
-    (132, 595),
-    (221, 626),
-    5,
-    1
-)
+    wall6 = Wall(
+        (132, 595),
+        (221, 626),
+        5,
+        1
+    )
 
-wall7 = Wall(
-    (393, 625),
-    (494, 636),
-    5,
-    1
-)
+    wall7 = Wall(
+        (393, 625),
+        (494, 636),
+        5,
+        1
+    )
 
-wall8 = Wall(
-    (608, 533),
-    (641, 493),
-    5,
-    1
-)
+    wall8 = Wall(
+        (608, 533),
+        (641, 493),
+        5,
+        1
+    )
 
-wall9 = Wall(
-    (20, 505),
-    (20, 434),
-    5,
-    1
-)
+    wall9 = Wall(
+        (20, 505),
+        (20, 434),
+        5,
+        1
+    )
+    
+    walls = [wall1, wall2, wall3, wall4, wall5, wall6, wall7, wall8, wall9]
+    for wall in walls:
+        wall.add_to_space()
+
+    return walls
+
+walls = init_walls()
 
 ball1 = Ball(
     (100, 100),
-    10,
-    1,
-    1
+    radius=10,
+    density=1,
+    elasticity=1,
+    collision_type=2
 )
 
-walls = [wall1, wall2, wall3, wall4, wall5, wall6, wall7, wall8, wall9]
-for wall in walls:
-    wall.add_to_space()
+ball2 = Ball(
+    (400, 100),
+    radius=10,
+    density=1,
+    elasticity=1,
+    collision_type=1
+)
+
 
 ball1.add_to_space()
+ball2.add_to_space()
 
 
 # display loop
@@ -150,7 +178,8 @@ while window_running:
 
     display.fill((235, 235, 235))
 
-    pygame.draw.circle(display, (255, 0, 0), (ball1.body.position[0], ball1.body.position[1]), 10)
+    ball1.draw()
+    ball2.draw()
     display.blit(ball1.texture, (ball1.body.position[0] - ball1.shape.radius, ball1.body.position[1] - ball1.shape.radius))
 
     for wall in walls:
