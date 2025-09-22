@@ -1,1 +1,1 @@
-A rudimentary small bouncing-ball simulation powered by pymunk and pygame.
+A small rudimentary simulation with a ball that bounces off of walls created using the pymunk and pygame libraries.
